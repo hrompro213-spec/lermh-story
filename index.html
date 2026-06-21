@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LERMH — Спрятана ли энергия внутри металла?">
+<meta property="og:description" content="Честное научное расследование: 748 точек, 50 лабораторий, 8 металлов. Энергия из воды — миф или путь? · Горячий цех × Ришат Нафиков">
+<meta property="og:image" content="https://hrompro213-spec.github.io/lermh-story/assets/preview.png">
+<meta property="og:url" content="https://hrompro213-spec.github.io/lermh-story/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://hrompro213-spec.github.io/lermh-story/assets/preview.png">
+<link rel="icon" href="./assets/preview.png">
+<link rel="apple-touch-icon" href="./assets/preview.png">
+<meta name="theme-color" content="#05060a">
+<title>LERMH — История открытия | The LERMH Story</title>
+<style>
+:root{
+  --bg:#05060a; --bg2:#0a0e1a; --ink:#e8ecf5; --mut:#8a94ad;
+  --acc:#4fd1ff; --acc2:#7c5cff; --hot:#ff6b3d; --gold:#ffd166;
+  --ok:#3ddc97; --kill:#ff5470; --card:rgba(255,255,255,.04);
+  --line:rgba(255,255,255,.09); --glow:0 0 40px rgba(79,209,255,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:radial-gradient(ellipse at 50% -10%,#10182e 0%,var(--bg) 55%);
+  color:var(--ink);font-family:-apple-system,'Segoe UI',Roboto,Inter,sans-serif;
+  line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px}
+
+/* ---- canvases ---- */
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.hero-canvas-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;min-height:280px}
+#heroParticles{position:absolute;inset:0;width:100%;height:100%;min-height:280px;display:block}
+.wave-field{display:block;width:100%;height:56px;margin:0;pointer-events:none;opacity:.55}
+.scene-canvas{display:block;width:100%;height:220px;min-height:180px;border-radius:14px;margin:24px 0;background:rgba(0,0,0,.25);border:1px solid var(--line)}
+#barrierCanvas{min-height:180px}
+#metalChart{display:block;width:100%;height:240px;min-height:200px;cursor:crosshair}
+
+/* ---- lang switch ---- */
+.langbar{position:fixed;top:14px;right:14px;z-index:99;display:flex;gap:6px;
+  background:rgba(10,14,26,.7);backdrop-filter:blur(10px);padding:5px;border-radius:30px;border:1px solid var(--line)}
+.langbar button{background:none;border:0;color:var(--mut);font-weight:700;
+  padding:7px 16px;border-radius:24px;cursor:pointer;font-size:13px;transition:.25s;min-height:44px;min-width:44px}
+.langbar button.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04060c}
+
+/* ---- progress ---- */
+#prog{position:fixed;top:0;left:0;height:3px;width:0;z-index:100;
+  background:linear-gradient(90deg,var(--acc),var(--acc2),var(--hot))}
+
+/* ---- sections ---- */
+section{position:relative;z-index:1;padding:90px 0;border-bottom:1px solid var(--line)}
+.reveal{opacity:0;transform:translateY(40px);transition:.9s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.kick{color:var(--acc);font-size:13px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+h1{font-size:clamp(28px,7vw,68px);line-height:1.08;font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(120deg,#fff 30%,var(--acc) 70%,var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent;
+  word-break:break-word;hyphens:auto}
+h2{font-size:clamp(24px,4.5vw,42px);font-weight:800;letter-spacing:-.5px;margin-bottom:18px}
+h3{font-size:20px;font-weight:700;margin:18px 0 8px;color:var(--acc)}
+p{color:var(--mut);font-size:17px;margin-bottom:14px}
+.big{font-size:clamp(16px,4vw,20px);color:var(--ink)}
+strong{color:var(--ink)}
+.alleg{background:var(--card);border-left:3px solid var(--gold);padding:16px 20px;border-radius:0 12px 12px 0;margin:18px 0}
+.alleg .lab{color:var(--gold);font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+.alleg p{color:var(--ink);margin:6px 0 0;font-style:italic}
+
+/* ---- hero ---- */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;border:0;overflow:hidden}
+#hero .reveal{position:relative;z-index:1}
+.atom{width:200px;height:200px;margin:30px auto 40px;position:relative;z-index:2}
+.nuc{position:absolute;top:50%;left:50%;width:26px;height:26px;margin:-13px;border-radius:50%;
+  background:radial-gradient(circle,#fff,var(--hot));box-shadow:0 0 30px var(--hot)}
+.orb{position:absolute;inset:0;border:1.5px solid rgba(79,209,255,.4);border-radius:50%}
+.orb:nth-child(2){transform:rotate(60deg);animation:spin 7s linear infinite}
+.orb:nth-child(3){transform:rotate(120deg);animation:spin 10s linear infinite reverse}
+.orb:nth-child(4){animation:spin 5s linear infinite}
+.orb i{position:absolute;top:-4px;left:50%;width:8px;height:8px;margin-left:-4px;border-radius:50%;
+  background:var(--acc);box-shadow:0 0 12px var(--acc)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.orb:nth-child(2) i{background:var(--acc2);box-shadow:0 0 12px var(--acc2)}
+
+/* ---- stat cards ---- */
+.grid{display:grid;gap:16px;margin-top:26px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:640px){.g2,.g3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;transition:.3s}
+.card:hover{border-color:var(--acc);box-shadow:var(--glow);transform:translateY(-3px)}
+.num{font-size:clamp(32px,8vw,42px);font-weight:900;background:linear-gradient(120deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.num.k{background:linear-gradient(120deg,var(--kill),var(--hot));-webkit-background-clip:text;background-clip:text}
+.num.ok{background:linear-gradient(120deg,var(--ok),var(--acc));-webkit-background-clip:text;background-clip:text}
+.lbl{color:var(--mut);font-size:14px;margin-top:8px}
+
+/* ---- timeline ---- */
+.tl{position:relative;margin-top:30px;padding-left:30px}
+.tl::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;
+  background:linear-gradient(var(--acc),var(--acc2),var(--hot));opacity:.25}
+.tl-fill{position:absolute;left:7px;top:6px;width:2px;height:0;
+  background:linear-gradient(var(--acc),var(--acc2),var(--hot));box-shadow:0 0 12px rgba(79,209,255,.5);
+  transition:height .6s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.step{position:relative;margin-bottom:28px;padding-left:18px;opacity:.35;transform:translateX(-6px);transition:.7s cubic-bezier(.2,.8,.2,1)}
+.step.lit{opacity:1;transform:none}
+.step::before{content:'';position:absolute;left:-30px;top:6px;width:16px;height:16px;border-radius:50%;
+  background:var(--bg2);border:3px solid var(--acc);box-shadow:0 0 10px var(--acc);transition:.5s}
+.step.lit::before{background:var(--acc);box-shadow:0 0 18px var(--acc),0 0 30px rgba(79,209,255,.3)}
+.step.kill::before{border-color:var(--kill);box-shadow:0 0 10px var(--kill)}
+.step.kill.lit::before{background:var(--kill);box-shadow:0 0 18px var(--kill),0 0 30px rgba(255,84,112,.3)}
+.step.win::before{border-color:var(--ok);box-shadow:0 0 10px var(--ok)}
+.step.win.lit::before{background:var(--ok);box-shadow:0 0 18px var(--ok),0 0 30px rgba(61,220,151,.3)}
+.step .t{font-size:12px;color:var(--acc);font-weight:800;letter-spacing:1px}
+.step.kill .t{color:var(--kill)}
+.step.win .t{color:var(--ok)}
+.step h4{font-size:18px;margin:3px 0 4px}
+.step p{font-size:15px;margin:0}
+.badge{display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px;margin-left:6px;vertical-align:middle}
+.badge.k{background:rgba(255,84,112,.15);color:var(--kill)}
+.badge.w{background:rgba(61,220,151,.15);color:var(--ok)}
+
+/* ---- chart ---- */
+.chart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-top:24px;position:relative}
+.chart-tooltip{position:absolute;display:none;background:rgba(10,14,26,.95);border:1px solid var(--acc);
+  border-radius:10px;padding:10px 14px;font-size:13px;pointer-events:none;z-index:5;white-space:nowrap;
+  box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.chart-tooltip b{color:var(--ink);font-size:16px;display:block;margin-bottom:2px}
+.chart-tooltip small{color:var(--mut)}
+.axis{font-size:11px;color:var(--mut);text-align:center;margin-top:12px}
+
+/* ---- invest ---- */
+.money{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.money .v{font-size:clamp(36px,9vw,48px);font-weight:900;color:var(--gold)}
+.estimate-tag{font-size:12px;color:var(--mut);font-style:italic;margin-top:4px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+@media(max-width:640px){.compare{grid-template-columns:1fr}}
+.compare .c{padding:20px;border-radius:14px;border:1px solid var(--line)}
+.compare .ai{background:linear-gradient(135deg,rgba(79,209,255,.08),rgba(124,92,255,.08));border-color:var(--acc)}
+.compare .noai{background:var(--card)}
+.yr{font-size:clamp(28px,7vw,36px);font-weight:900}
+.ai .yr{color:var(--acc)}
+.noai .yr{color:var(--mut)}
+
+/* ---- dream ---- */
+.dream{background:linear-gradient(135deg,rgba(124,92,255,.12),rgba(255,107,61,.08));
+  border:1px solid var(--acc2);border-radius:20px;padding:30px;margin-top:24px}
+.dream ul{list-style:none;margin-top:14px}
+.dream li{padding:12px 0;border-bottom:1px solid var(--line);font-size:17px;color:var(--ink);display:flex;gap:12px}
+.dream li:last-child{border:0}
+.dream li b{color:var(--gold)}
+.warn{font-size:13px;color:var(--mut);margin-top:16px;font-style:italic}
+
+/* ---- honest box ---- */
+.honest{background:rgba(255,84,112,.06);border:1px solid rgba(255,84,112,.3);border-radius:14px;padding:18px 22px;margin-top:20px}
+.honest .lab{color:var(--kill);font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase}
+
+/* ---- cta ---- */
+.cta{text-align:center;padding:60px 0}
+.btn{display:inline-block;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04060c;
+  font-weight:800;padding:16px 38px;border-radius:40px;text-decoration:none;font-size:17px;box-shadow:var(--glow);
+  transition:.3s;min-height:48px;line-height:1.2}
+.btn:hover{transform:translateY(-3px) scale(1.03)}
+
+/* ---- footer ---- */
+footer{text-align:center;padding:50px 20px;color:var(--mut);font-size:13px;position:relative;z-index:1}
+footer .studio{color:var(--hot);font-weight:800;letter-spacing:1px}
+footer .author{color:var(--ink);font-weight:700;margin-top:6px}
+
+[data-en]{display:none}
+body.en [data-ru]{display:none}
+body.en [data-en]{display:block}
+body.en span[data-en],body.en b[data-en],body.en small[data-en]{display:inline}
+span[data-en],b[data-en],small[data-en]{display:none}
+
+/* ---- mobile 360–414 ---- */
+@media(max-width:414px){
+  .wrap{padding:0 16px}
+  section{padding:64px 0}
+  .kick{font-size:11px;letter-spacing:2px}
+  h2{font-size:22px}
+  p,.big{font-size:15px}
+  .atom{width:160px;height:160px;margin:20px auto 28px}
+  .card{padding:18px}
+  .chart{padding:16px 12px}
+  .scene-canvas{height:180px;margin:16px 0}
+  #metalChart{height:200px}
+  .langbar{top:10px;right:10px}
+  .langbar button{padding:10px 18px;font-size:14px}
+  .tl{padding-left:26px}
+  .step h4{font-size:16px}
+  .dream{padding:20px}
+  .dream li{font-size:15px}
+  .btn{padding:14px 28px;font-size:16px;width:100%;max-width:320px}
+  .alleg{padding:14px 16px}
+}
+@media(max-width:360px){
+  h1{font-size:26px}
+  .num{font-size:28px}
+}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div id="prog"></div>
+<div class="langbar">
+  <button id="bru" class="on" onclick="setLang('ru')">RU</button>
+  <button id="ben" onclick="setLang('en')">EN</button>
+</div>
+
+<!-- HERO -->
+<section id="hero" class="wrap">
+  <div class="hero-canvas-wrap"><canvas id="heroParticles"></canvas></div>
+  <div class="reveal in" style="text-align:center">
+    <div class="atom">
+      <div class="nuc"></div>
+      <div class="orb"><i></i></div>
+      <div class="orb"><i></i></div>
+      <div class="orb"><i></i></div>
+    </div>
+    <div class="kick" data-ru>Проект LERMH · D(d,p)T · экранирование U<sub>e</sub></div>
+    <div class="kick" data-en>The LERMH Project · D(d,p)T · screening U<sub>e</sub></div>
+    <h1 data-ru>Спрятана ли энергия<br>внутри металла?</h1>
+    <h1 data-en>Is there hidden energy<br>inside the metal?</h1>
+    <p class="big" data-ru>История одного честного научного расследования — от мирового архива ядерных данных до порога нового эксперимента.</p>
+    <p class="big" data-en>The story of one honest scientific investigation — from the world's nuclear data archive to the threshold of a new experiment.</p>
+  </div>
+</section>
+<canvas class="wave-field" data-wave="0"></canvas>
+
+<!-- 1. THE QUESTION -->
+<section class="wrap" id="ch1">
+  <div class="reveal">
+    <div class="kick" data-ru>Глава 1 · Вопрос</div>
+    <div class="kick" data-en>Chapter 1 · The Question</div>
+    <h2 data-ru>Атомы не любят сближаться</h2>
+    <h2 data-en>Atoms hate getting close</h2>
+    <p data-ru>Чтобы два ядра дейтерия слились и выделили энергию, им надо преодолеть отталкивание — «кулоновский барьер». Это как закатить шар на гору.</p>
+    <p data-en>For two deuterium nuclei to fuse and release energy, they must overcome repulsion — the "Coulomb barrier". Like rolling a ball uphill.</p>
+    <canvas id="barrierCanvas" class="scene-canvas" height="220"></canvas>
+    <div class="alleg">
+      <div class="lab" data-ru>🎯 На пальцах</div><div class="lab" data-en>🎯 In plain words</div>
+      <p data-ru>«Электроны вокруг ядер работают как смазка: они экранируют заряд и чуть-чуть занижают гору. Вопрос на миллиард: в металле эта смазка сильнее, чем в газе?»</p>
+      <p data-en>"Electrons around nuclei act like grease: they screen the charge and lower the hill a bit. The billion-dollar question: is this grease stronger inside a metal than in a gas?"</p>
+    </div>
+    <div class="grid g3" id="ch1Cards"></div>
+    <p data-ru style="margin-top:20px" id="ch1GapText"></p>
+    <p data-en style="margin-top:20px" id="ch1GapTextEn"></p>
+  </div>
+</section>
+<canvas class="wave-field" data-wave="1"></canvas>
+
+<!-- 2. THE METHOD -->
+<section class="wrap">
+  <div class="reveal">
+    <div class="kick" data-ru>Глава 2 · Метод</div>
+    <div class="kick" data-en>Chapter 2 · The Method</div>
+    <h2 data-ru>Мы не строили реактор. Мы допросили архив.</h2>
+    <h2 data-en>We didn't build a reactor. We interrogated the archive.</h2>
+    <p data-ru>Вместо нового дорогого эксперимента — взяли весь мировой открытый архив ядерных данных (EXFOR) и проверили: можно ли вообще <strong>вытащить</strong> ответ из того, что уже измерило человечество?</p>
+    <p data-en>Instead of an expensive new experiment, we took the entire open world nuclear data archive (EXFOR) and asked: can the answer even be <strong>extracted</strong> from what humanity already measured?</p>
+    <div class="grid g3" id="ch2Cards"></div>
+    <div class="alleg">
+      <div class="lab" data-ru>🔬 Три независимых детектива</div><div class="lab" data-en>🔬 Three independent detectives</div>
+      <p data-ru>«Мы допросили данные тремя разными методами — классической статистикой, байесовским анализом и компьютерной симуляцией. Если бы хоть один соврал — другие бы поймали. Все трое пришли к одному выводу.»</p>
+      <p data-en>"We interrogated the data with three different methods — classical statistics, Bayesian analysis, and computer simulation. If one lied, the others would catch it. All three reached the same verdict."</p>
+    </div>
+  </div>
+</section>
+<canvas class="wave-field" data-wave="2"></canvas>
+
+<!-- 3. JOURNEY / TIMELINE -->
+<section class="wrap" id="journeySec">
+  <div class="reveal">
+    <div class="kick" data-ru>Глава 3 · Путь</div>
+    <div class="kick" data-en>Chapter 3 · The Journey</div>
+    <h2 data-ru>Как шло расследование</h2>
+    <h2 data-en>How the investigation unfolded</h2>
+    <p data-ru>Главная ценность проекта — научная честность. Мы фиксировали каждый тупик так же громко, как каждую находку.</p>
+    <p data-en>The project's core value is scientific honesty. We logged every dead-end as loudly as every find.</p>
+    <div class="tl" id="journeyTl">
+      <div class="tl-fill" id="journeyFill"></div>
+      <div class="step win" data-step="0">
+        <div class="t">STEP 01 · CONTROL</div>
+        <h4 data-ru>Газ-эталон чист <span class="badge w">✓ PASS</span></h4>
+        <h4 data-en>Gas reference is clean <span class="badge w">✓ PASS</span></h4>
+        <p data-ru id="step01ru"></p>
+        <p data-en id="step01en"></p>
+      </div>
+      <div class="step" data-step="1">
+        <div class="t">STEP 02 · SIGNAL</div>
+        <h4 data-ru>Четыре металла «вспыхнули»</h4>
+        <h4 data-en>Four metals "lit up"</h4>
+        <p data-ru>Четыре металла вспыхнули. На секунду показалось — вот оно. Цифры в 50 раз выше теории. Соблазн объявить открытие был огромен.</p>
+        <p data-en>Four metals lit up. For a second it felt like — this is it. Numbers 50× above theory. The temptation to announce a discovery was enormous.</p>
+      </div>
+      <div class="step kill" data-step="2">
+        <div class="t">STEP 03 · KILL #1</div>
+        <h4 data-ru>Красивое «среднее» — отброшено <span class="badge k">✗ KILL</span></h4>
+        <h4 data-en>The pretty "average" — discarded <span class="badge k">✗ KILL</span></h4>
+        <p data-ru>И тогда мы сделали то, что отличает науку от веры — попытались <strong>себя опровергнуть</strong>. И опровергли. Красивое среднее <span id="pooledVal"></span> эВ провалило тест качества (χ²=<span id="pooledChi"></span>). Честно выбросили.</p>
+        <p data-en>Then we did what separates science from faith — we tried to <strong>falsify ourselves</strong>. And we did. The pretty average of <span id="pooledValEn"></span> eV failed the quality test (χ²=<span id="pooledChiEn"></span>). Honestly discarded.</p>
+      </div>
+      <div class="step kill" data-step="3">
+        <div class="t">STEP 04 · KILL #2</div>
+        <h4 data-ru>Независимая опора рухнула <span class="badge k">✗ KILL</span></h4>
+        <h4 data-en>Independent baseline collapsed <span class="badge k">✗ KILL</span></h4>
+        <p data-ru>Эталонная база ENDF имела всего 2 точки в нашем окне — слишком грубо. Линия закрыта.</p>
+        <p data-en>The ENDF reference had only 2 nodes in our window — too coarse. Line closed.</p>
+      </div>
+      <div class="step win" data-step="4">
+        <div class="t">STEP 05 · VERDICT</div>
+        <h4 data-ru>Честный потолок <span class="badge w">✓ TRUTH</span></h4>
+        <h4 data-en>The honest ceiling <span class="badge w">✓ TRUTH</span></h4>
+        <p data-ru>Это не провал. Это самое честное, что может сказать учёный: «из этих данных ответа нет — нужен новый эксперимент». И мы знаем какой. Вывод трёх методов: из архива ответ <strong>извлечь нельзя</strong> — данные разных лабораторий несопоставимы.</p>
+        <p data-en>This is not a failure. It's the most honest thing a scientist can say: "these data hold no answer — a new experiment is needed." And we know which one. Verdict of all three methods: the answer <strong>cannot be extracted</strong> from the archive — data from different labs are incomparable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<canvas class="wave-field" data-wave="3"></canvas>
+
+<!-- 4. THE DATA CHART -->
+<section class="wrap" id="chartSec">
+  <div class="reveal">
+    <div class="kick" data-ru>Глава 4 · Цифры</div>
+    <div class="kick" data-en>Chapter 4 · The Numbers</div>
+    <h2 data-ru>Что показали 8 металлов</h2>
+    <h2 data-en>What the 8 metals revealed</h2>
+    <p data-ru>Отклонения экранирования U<sub>e</sub> по металлам (эВ). Зелёные — «нули», оранжевые — значимый сигнал, серые — на границе метода.</p>
+    <p data-en>Screening deviation U<sub>e</sub> per metal (eV). Green = zeros, orange = significant signal, grey = at method boundary.</p>
+    <div class="chart">
+      <canvas id="metalChart" height="240"></canvas>
+      <div class="chart-tooltip" id="chartTip"><b></b><small></small></div>
+      <div class="axis" data-ru id="chartAxisRu"></div>
+      <div class="axis" data-en id="chartAxisEn"></div>
+    </div>
+    <div class="honest">
+      <div class="lab" data-ru>⚠ Научная честность</div><div class="lab" data-en>⚠ Scientific honesty</div>
+      <p style="color:var(--ink)" data-ru>Оранжевые столбцы — это <strong>сигнал, но НЕ измерение</strong>. Их значения зависят от границ модели и не воспроизводятся независимой опорой. Поэтому проект не объявляет открытие — он доказывает, что нужен новый эксперимент.</p>
+      <p style="color:var(--ink)" data-en>The orange bars are a <strong>signal, but NOT a measurement</strong>. Their values depend on model bounds and aren't reproduced by an independent baseline. So the project claims no discovery — it proves a new experiment is needed.</p>
+    </div>
+  </div>
+</section>
+<canvas class="wave-field" data-wave="4"></canvas>
+
+<!-- 5. WHY IT MATTERS / VALUE -->
+<section class="wrap">
+  <div class="reveal">
+    <div class="kick" data-ru>Глава 5 · Ценность</div>
+    <div class="kick" data-en>Chapter 5 · Why it matters</div>
+    <h2 data-ru>Мы сэкономили инвестору миллионы</h2>
+    <h2 data-en>We saved the investor millions</h2>
+    <p data-ru>Обычный путь — построить установку за миллионы и потом узнать, что данные несопоставимы. Мы прошли этот тупик <strong>на бумаге и в коде</strong>, за доли стоимости, и точно знаем, какой эксперимент имеет смысл.</p>
+    <p data-en>The usual path — build a facility for millions, then discover the data is incomparable. We walked that dead-end <strong>on paper and in code</strong>, for a fraction of the cost, and now know exactly which experiment makes sense.</p>
+    <div class="alleg">
+      <div class="lab" data-ru>💡 Аллегория</div><div class="lab" data-en>💡 Allegory</div>
+      <p data-ru>«Прежде чем бурить нефтяную скважину за $10 млн, мы сделали полную геологоразведку за $10 тыс. И нашли точное место, где бурить стоит — а где нет.»</p>
+      <p data-en>"Before drilling a $10M oil well, we did a full geological survey for $10K. And found the exact spot worth drilling — and where it isn't."</p>
+    </div>
+    <div class="grid g3" id="ch5Cards"></div>
+  </div>
+</section>
+<canvas class="wave-field" data-wave="5"></canvas>
+
+<!-- 6. ROADMAP -->
+<section class="wrap" id="roadmapSec">
+  <div class="reveal">
+    <div class="kick" data-ru>Глава 6 · Дорога вперёд</div>
+    <div class="kick" data-en>Chapter 6 · The Road Ahead</div>
+    <h2 data-ru>Куда двигаться дальше</h2>
+    <h2 data-en>Where we go next</h2>
+    <p data-ru>Проект упёрся в честный потолок архива. Дальше — только новый, правильно спроектированный эксперимент <strong>LERMH</strong>: газ и металл на одной установке, измерение всех каналов реакции.</p>
+    <p data-en>The project hit the archive's honest ceiling. Next — only a new, properly designed <strong>LERMH</strong> experiment: gas and metal on one setup, measuring all reaction channels.</p>
+    <div class="tl" id="roadmapTl">
+      <div class="tl-fill" id="roadmapFill"></div>
+      <div class="step" data-rstep="0"><div class="t">PHASE 1 · 6–12 мес / months</div>
+        <h4 data-ru>Цифровой двойник + дизайн</h4><h4 data-en>Digital twin + design</h4>
+        <p data-ru>Симуляция чувствительности: различит ли установка U<sub>e</sub>=30 от 100 эВ на уровне 3σ. Пререгистрация метода.</p>
+        <p data-en>Sensitivity simulation: can the setup tell U<sub>e</sub>=30 from 100 eV at 3σ. Pre-registered method.</p>
+      </div>
+      <div class="step" data-rstep="1"><div class="t">PHASE 2 · 12–24 мес / months</div>
+        <h4 data-ru>Постройка установки LERMH</h4><h4 data-en>Build the LERMH setup</h4>
+        <p data-ru>Низкоэнергетический ускоритель, газовая и металлическая мишени на одном пучке, балансовая детекция p/t/n.</p>
+        <p data-en>Low-energy accelerator, gas & metal targets on one beam, p/t/n balance detection.</p>
+      </div>
+      <div class="step win" data-rstep="2"><div class="t">PHASE 3 · 24–36 мес / months</div>
+        <h4 data-ru>Измерение и вердикт <span class="badge w">★</span></h4><h4 data-en>Measurement & verdict <span class="badge w">★</span></h4>
+        <p data-ru>Прямое сравнение газ vs металл на одной установке — конфаундер снят. Бинарный ответ: новая физика да/нет.</p>
+        <p data-en>Direct gas-vs-metal on one setup — confounder removed. Binary answer: new physics yes/no.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<canvas class="wave-field" data-wave="6"></canvas>
+
+<!-- 7. INVESTMENT -->
+<section class="wrap">
+  <div class="reveal">
+    <div class="kick" data-ru>Глава 7 · Инвестиции</div>
+    <div class="kick" data-en>Chapter 7 · Investment</div>
+    <h2 data-ru>Сколько нужно и сколько лет</h2>
+    <h2 data-en>What it takes & how long</h2>
+    <div class="card" style="margin-top:8px">
+      <div class="money">
+        <span data-ru style="color:var(--mut)">До научного вердикта:</span>
+        <span data-en style="color:var(--mut)">To scientific verdict:</span>
+        <span class="v" id="investRange"></span>
+      </div>
+      <p class="estimate-tag" data-ru>⚠ Маркетинговая оценка, не оферта. Точная смета — после инженерного дизайна.</p>
+      <p class="estimate-tag" data-en>⚠ Marketing estimate, not an offer. Exact budget — after engineering design.</p>
+      <p style="margin-top:6px" data-ru id="investDescRu"></p>
+      <p style="margin-top:6px" data-en id="investDescEn"></p>
+    </div>
+    <h3 data-ru style="margin-top:24px">С ИИ против без ИИ — гонка времени</h3>
+    <h3 data-en style="margin-top:24px">With AI vs without — the time race</h3>
+    <div class="compare">
+      <div class="c ai">
+        <div class="kick" style="margin:0 0 8px" data-ru>🤖 С ИИ-ускорением</div>
+        <div class="kick" style="margin:0 0 8px" data-en>🤖 AI-accelerated</div>
+        <div class="yr" data-ru id="aiYearsRu"></div><div class="yr" data-en id="aiYearsEn"></div>
+        <p style="margin-top:6px" data-ru>ИИ ведёт анализ, ловит ловушки, хранит весь контекст, чистит данные 24/7. Уже доказано на этом проекте.</p>
+        <p style="margin-top:6px" data-en>AI runs analysis, catches traps, holds full context, cleans data 24/7. Already proven on this project.</p>
+      </div>
+      <div class="c noai">
+        <div class="kick" style="margin:0 0 8px" data-ru>🐢 Классически</div>
+        <div class="kick" style="margin:0 0 8px" data-en>🐢 Classical</div>
+        <div class="yr" data-ru id="classYearsRu"></div><div class="yr" data-en id="classYearsEn"></div>
+        <p style="margin-top:6px" data-ru>Ручной анализ, потеря контекста между сменами команд, дубли тупиков, бумажная бюрократия.</p>
+        <p style="margin-top:6px" data-en>Manual analysis, context lost between teams, repeated dead-ends, paper bureaucracy.</p>
+      </div>
+    </div>
+    <h3 data-ru style="margin-top:24px">До коммерческого успеха</h3>
+    <h3 data-en style="margin-top:24px">To commercial success</h3>
+    <div class="grid g2" id="commercialCards"></div>
+  </div>
+</section>
+<canvas class="wave-field" data-wave="7"></canvas>
+
+<!-- 8. THE DREAM -->
+<section class="wrap">
+  <div class="reveal">
+    <div class="kick" data-ru>Глава 8 · Если подтвердится</div>
+    <div class="kick" data-en>Chapter 8 · If confirmed</div>
+    <h2 data-ru>Чем «грозит» открытие 🚀</h2>
+    <h2 data-en>What the discovery "threatens" 🚀</h2>
+    <div class="dream">
+      <p style="color:var(--ink);font-size:18px" data-ru>Если эффект усиленного экранирования в металле реален — это значит, что путь к управляемому синтезу можно срезать. Тогда:</p>
+      <p style="color:var(--ink);font-size:18px" data-en>If the enhanced screening effect in metals is real — the path to controlled fusion can be shortcut. Then:</p>
+      <ul>
+        <li data-ru>⚡ <span><b>Энергия из воды.</b> Дейтерий — из обычной воды. Топливо в океанах на миллионы лет.</span></li>
+        <li data-en>⚡ <span><b>Energy from water.</b> Deuterium from ordinary water. Fuel in the oceans for millions of years.</span></li>
+        <li data-ru>🌍 <span><b>Чистая энергетика.</b> Никакого CO₂, никаких долгоживущих отходов.</span></li>
+        <li data-en>🌍 <span><b>Clean energy.</b> No CO₂, no long-lived waste.</span></li>
+        <li data-ru>🔋 <span><b>Компактные источники.</b> Энергоблок размером с комнату вместо станции в гектары.</span></li>
+        <li data-en>🔋 <span><b>Compact sources.</b> A room-sized power unit instead of a hectares-wide plant.</span></li>
+        <li data-ru>📖 <span><b>Новая глава физики.</b> Если барьер реально занижается в твёрдом теле — переписываются учебники.</span></li>
+        <li data-en>📖 <span><b>A new chapter of physics.</b> If the barrier truly lowers in solids — textbooks get rewritten.</span></li>
+      </ul>
+      <p class="warn" data-ru>⚠ Это сценарий-мечта при научном подтверждении. Сегодня проект честно стоит на пороге эксперимента, который этот сценарий проверит. Мы продаём не чудо — мы продаём строгий путь к ответу.</p>
+      <p class="warn" data-en>⚠ This is a dream-scenario upon scientific confirmation. Today the project honestly stands at the threshold of the experiment that will test it. We're not selling a miracle — we're selling a rigorous path to the answer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="wrap cta reveal">
+  <h2 data-ru>Купить «дешёвый билет» в новую физику?</h2>
+  <h2 data-en>Buy the "cheap ticket" into new physics?</h2>
+  <p data-ru style="max-width:560px;margin:0 auto 26px">Метод доказан. Тупики пройдены. Путь размечен. Нужен эксперимент LERMH — и партнёр, который увидит окно первым.</p>
+  <p data-en style="max-width:560px;margin:0 auto 26px">The method is proven. Dead-ends walked. The path mapped. We need the LERMH experiment — and a partner who sees the window first.</p>
+  <a class="btn" href="#hero" data-ru>↑ В начало истории</a>
+  <a class="btn" href="#hero" data-en>↑ Back to the story</a>
+</section>
+
+<footer>
+  <div data-ru>Разработка, дизайн — креастудия <span class="studio">«Горячий цех»</span></div>
+  <div data-en>Development & design — <span class="studio">"Hot Shop"</span> creative studio</div>
+  <div class="author" data-ru>Автор идеи, концепции и работы — Ришат Нафиков</div>
+  <div class="author" data-en>Idea, concept & work — Rishat Nafikov</div>
+  <div style="margin-top:14px;opacity:.5;font-size:11px" data-ru>Научная основа: верификация электронного экранирования D(d,p)T на архиве EXFOR · все числа — рабочие, требуют сверки перед публикацией</div>
+  <div style="margin-top:14px;opacity:.5;font-size:11px" data-en>Scientific basis: verification of D(d,p)T electron screening on the EXFOR archive · all figures are working values, to be verified before publication</div>
+</footer>
+
+<script>
+/* ═══ ALL EDITABLE NUMBERS — single source ═══ */
+const DATA = {
+  theory: { min: 20, max: 30 },
+  luna: { min: 100, max: 300 },
+  gap: { min: 5, max: 10 },
+  archive: { points: 748, sources: 50, metals: 8 },
+  gas: { ue: 7.6, err: 6.6 },
+  pooled: { ue: 168, chi2: 7.81 },
+  endfNodes: 2,
+  metals: [
+    { sym:'Al', ue:0,   err:24.6, h:20,  kind:'ok',  show:'~0' },
+    { sym:'Au', ue:0,   err:30.5, h:14,  kind:'ok',  show:'~0' },
+    { sym:'Cu', ue:371, err:45.6, h:68,  kind:'hot', show:'371' },
+    { sym:'Hf', ue:0,   err:50.5, h:18,  kind:'mut', show:'~0' },
+    { sym:'Nd', ue:0,   err:36.6, h:18,  kind:'mut', show:'~0' },
+    { sym:'Pb', ue:355, err:23.0, h:65,  kind:'hot', show:'355' },
+    { sym:'Pd', ue:555, err:34.5, h:100, kind:'hot', show:'555' },
+    { sym:'Pt', ue:508, err:48.4, h:93,  kind:'hot', show:'508' }
+  ],
+  window: { min: 2.39, max: 14.97 },
+  value: { simDoors: 5, methods: 3, repro: '100%' },
+  invest: {
+    minM: 2, maxM: 4, teamYears: 3,
+    aiYears: 3, classMin: 7, classMax: 10,
+    commAiMin: 5, commAiMax: 8, commClassMin: 15, commClassMax: 20
+  },
+  colors: { ok:'#3ddc97', hot:'#ff6b3d', mut:'#8a94ad', acc:'#4fd1ff', acc2:'#7c5cff' }
+};
+
+/* ---- populate DOM from DATA ---- */
+(function fill(){
+  const d=DATA;
+  document.getElementById('ch1Cards').innerHTML=`
+    <div class="card"><div class="num">${d.theory.min}–${d.theory.max}</div><div class="lbl" data-ru>эВ — что предсказывает теория</div><div class="lbl" data-en>eV — what theory predicts</div></div>
+    <div class="card"><div class="num ok">${d.luna.min}–${d.luna.max}</div><div class="lbl" data-ru>эВ — что показали эксперименты (LUNA)</div><div class="lbl" data-en>eV — what experiments showed (LUNA)</div></div>
+    <div class="card"><div class="num k">${d.gap.min}–${d.gap.max}×</div><div class="lbl" data-ru>необъяснённое расхождение</div><div class="lbl" data-en>unexplained discrepancy</div></div>`;
+  document.getElementById('ch1GapText').textContent=
+    `Этот разрыв в ${d.gap.min}–${d.gap.max} раз известен науке 20 лет и не объяснён. Если он реален — это новая физика. Если артефакт — ошибка целого класса измерений.`;
+  document.getElementById('ch1GapTextEn').textContent=
+    `This ${d.gap.min}–${d.gap.max}× gap has been known for 20 years and remains unexplained. If real — it's new physics. If an artifact — a flaw in a whole class of measurements.`;
+  document.getElementById('ch2Cards').innerHTML=`
+    <div class="card"><div class="num">${d.archive.points}</div><div class="lbl" data-ru>точек данных</div><div class="lbl" data-en>data points</div></div>
+    <div class="card"><div class="num">${d.archive.sources}</div><div class="lbl" data-ru>научных источников</div><div class="lbl" data-en>scientific sources</div></div>
+    <div class="card"><div class="num">${d.archive.metals}</div><div class="lbl" data-ru>металлов-мишеней</div><div class="lbl" data-en>target metals</div></div>`;
+  document.getElementById('step01ru').innerHTML=
+    `Контрольный газ дал U<sub>e</sub> = ${d.gas.ue} ± ${d.gas.err} эВ — согласуется с нулём. Прибор-метод честен.`;
+  document.getElementById('step01en').innerHTML=
+    `Control gas gave U<sub>e</sub> = ${d.gas.ue} ± ${d.gas.err} eV — consistent with zero. The method is honest.`;
+  ['pooledVal','pooledValEn'].forEach(id=>document.getElementById(id).textContent=d.pooled.ue);
+  ['pooledChi','pooledChiEn'].forEach(id=>document.getElementById(id).textContent=d.pooled.chi2);
+  document.getElementById('chartAxisRu').innerHTML=
+    `U<sub>e</sub>, эВ · ширина окна ${d.window.min}–${d.window.max} кэВ (система центра масс)`;
+  document.getElementById('chartAxisEn').innerHTML=
+    `U<sub>e</sub>, eV · window ${d.window.min}–${d.window.max} keV (center-of-mass frame)`;
+  document.getElementById('ch5Cards').innerHTML=`
+    <div class="card"><div class="num ok">${d.value.simDoors}/5</div><div class="lbl" data-ru>дверей закрыто в симуляции — метод прошёл стресс-тест</div><div class="lbl" data-en>doors closed in simulation — method passed stress-test</div></div>
+    <div class="card"><div class="num ok">${d.value.methods}</div><div class="lbl" data-ru>независимых метода сошлись в выводе</div><div class="lbl" data-en>independent methods converged</div></div>
+    <div class="card"><div class="num ok">${d.value.repro}</div><div class="lbl" data-ru>воспроизводимость — весь путь в Git</div><div class="lbl" data-en>reproducibility — full Git trail</div></div>`;
+  document.getElementById('investRange').textContent=`$${d.invest.minM}–${d.invest.maxM}M`;
+  document.getElementById('investDescRu').textContent=
+    `Установка LERMH + ${d.invest.teamYears} года команды. Это «дешёвый билет» в поле, где альтернативы стоят десятки миллионов.`;
+  document.getElementById('investDescEn').textContent=
+    `LERMH setup + ${d.invest.teamYears}-year team. A "cheap ticket" into a field where alternatives cost tens of millions.`;
+  document.getElementById('aiYearsRu').textContent=`~${d.invest.aiYears} года`;
+  document.getElementById('aiYearsEn').textContent=`~${d.invest.aiYears} years`;
+  document.getElementById('classYearsRu').textContent=`${d.invest.classMin}–${d.invest.classMax} лет`;
+  document.getElementById('classYearsEn').textContent=`${d.invest.classMin}–${d.invest.classMax} years`;
+  document.getElementById('commercialCards').innerHTML=`
+    <div class="card"><div class="num">${d.invest.commAiMin}–${d.invest.commAiMax}</div><div class="lbl" data-ru>лет с ИИ — от вердикта до прототипа энергоустройства (при подтверждении)</div><div class="lbl" data-en>years with AI — verdict to energy-device prototype (if confirmed)</div></div>
+    <div class="card"><div class="num">${d.invest.commClassMin}–${d.invest.commClassMax}</div><div class="lbl" data-ru>лет классическим путём</div><div class="lbl" data-en>years the classical way</div></div>`;
+})();
+
+/* ---- language ---- */
+function setLang(l){
+  document.body.classList.toggle('en', l==='en');
+  document.documentElement.lang=l;
+  document.getElementById('bru').classList.toggle('on', l==='ru');
+  document.getElementById('ben').classList.toggle('on', l==='en');
+}
+
+/* ---- canvas helpers ---- */
+function setupCanvas(cv){
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const r=cv.getBoundingClientRect();
+  let W=r.width, H=r.height;
+  if(!Number.isFinite(W)||W<1) W=cv.clientWidth||cv.offsetWidth||parseFloat(cv.getAttribute('width'))||800;
+  if(!Number.isFinite(H)||H<1) H=cv.clientHeight||cv.offsetHeight||parseFloat(cv.getAttribute('height'))||200;
+  W=Math.max(W,1); H=Math.max(H,1);
+  cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr);
+  const cx=cv.getContext('2d'); cx.setTransform(dpr,0,0,dpr,0,0);
+  return {cx,W,H,dpr};
+}
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    const rad=Math.min(r||0,w/2,h/2);
+    this.moveTo(x+rad,y); this.lineTo(x+w-rad,y);
+    this.quadraticCurveTo(x+w,y,x+w,y+rad); this.lineTo(x+w,y+h-rad);
+    this.quadraticCurveTo(x+w,y+h,x+w-rad,y+h); this.lineTo(x+rad,y+h);
+    this.quadraticCurveTo(x,y+h,x,y+h-rad); this.lineTo(x,y+rad);
+    this.quadraticCurveTo(x,y,x+rad,y); this.closePath();
+  };
+}
+
+/* ---- scroll reveal ---- */
+const io=new IntersectionObserver((es)=>{
+  es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---- progress bar ---- */
+let scrollY=0;
+window.addEventListener('scroll',()=>{
+  scrollY=window.scrollY;
+  const h=document.documentElement;
+  document.getElementById('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+},{passive:true});
+
+/* ---- starfield ---- */
+(function(){
+  const cv=document.getElementById('stars');
+  let S,cx,W,H;
+  function init(){({cx,W,H}=setupCanvas(cv)); S=Array.from({length:90},()=>({x:Math.random()*W,y:Math.random()*H,z:Math.random()*1.4+.3,s:Math.random()*1.6+.4})); }
+  function draw(){
+    cx.clearRect(0,0,W,H);
+    S.forEach(s=>{ s.y+=s.z*.15; if(s.y>H){s.y=0;s.x=Math.random()*W;}
+      cx.globalAlpha=s.z*.6; cx.fillStyle=s.z>1?DATA.colors.acc2:DATA.colors.acc;
+      cx.beginPath();cx.arc(s.x,s.y,s.s,0,7);cx.fill(); });
+    requestAnimationFrame(draw);
+  }
+  init(); draw(); addEventListener('resize',init);
+})();
+
+/* ---- hero particle trails (bubble chamber) ---- */
+(function(){
+  const cv=document.getElementById('heroParticles');
+  let cx,W,H,pts=[],t=0;
+  function init(){
+    const wrap=cv.parentElement;
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    let w=wrap?wrap.clientWidth:innerWidth;
+    let h=wrap?wrap.clientHeight:280;
+    if(w<1) w=innerWidth||800;
+    if(h<1) h=280;
+    cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+    cx=cv.getContext('2d'); cx.setTransform(dpr,0,0,dpr,0,0);
+    W=w; H=h; pts=[];
+    for(let i=0;i<28;i++) pts.push(spawn(true));
+  }
+  function spawn(rand){
+    const a=Math.random()*Math.PI*2, sp=.4+Math.random()*1.2;
+    return {x:rand?Math.random()*W:W*.5+(Math.random()-.5)*40, y:rand?Math.random()*H:H*.7,
+      vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-Math.random()*.3, trail:[], hue:Math.random()>.4?210:270};
+  }
+  function draw(){
+    t+=.016;
+    const para=scrollY*.08;
+    cx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy*.6;
+      p.trail.push({x:p.x,y:p.y}); if(p.trail.length>22) p.trail.shift();
+      if(p.x<-20||p.x>W+20||p.y<-20||p.y>H+20) Object.assign(p,spawn(false));
+      const g=cx.createLinearGradient(p.trail[0]?.x||p.x,p.trail[0]?.y||p.y,p.x,p.y);
+      g.addColorStop(0,'rgba(79,209,255,0)'); g.addColorStop(1,`hsla(${p.hue},80%,65%,.85)`);
+      cx.strokeStyle=g; cx.lineWidth=1.5; cx.beginPath();
+      p.trail.forEach((pt,i)=>{ const yy=pt.y-para*(.3+i/p.trail.length*.7); i?cx.lineTo(pt.x,yy):cx.moveTo(pt.x,yy); });
+      cx.stroke();
+      cx.fillStyle=`hsla(${p.hue},90%,70%,.9)`;
+      cx.beginPath();cx.arc(p.x,p.y-para*.5,2,0,7);cx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  init(); draw(); addEventListener('resize',init);
+  window.addEventListener('load',init);
+})();
+
+/* ---- coulomb barrier fusion scene ---- */
+(function(){
+  const cv=document.getElementById('barrierCanvas');
+  let cx,W,H,running=false,frame=0;
+  function initCanvas(){({cx,W,H}=setupCanvas(cv));}
+  function barrierY(x){ const mid=W*.5; return H*.72-Math.exp(-Math.pow((x-mid)/(W*.18),2))*H*.38; }
+  function drawScene(){
+    if(!running) return;
+    frame++; const phase=Math.floor(frame/180)%4;
+    const prog=(frame%180)/180;
+    cx.clearRect(0,0,W,H);
+    cx.strokeStyle='rgba(255,255,255,.04)'; cx.lineWidth=1;
+    for(let i=0;i<W;i+=30){cx.beginPath();cx.moveTo(i,0);cx.lineTo(i,H);cx.stroke();}
+    const lubric=phase>=2?Math.min(1,(frame%180)/90):0;
+    const drop=lubric*H*.22;
+    cx.beginPath(); cx.moveTo(0,H);
+    for(let x=0;x<=W;x+=4){
+      const by=barrierY(x)-drop*Math.exp(-Math.pow((x-W*.5)/(W*.22),2));
+      cx.lineTo(x,by);
+    }
+    cx.lineTo(W,H); cx.closePath();
+    const bg=cx.createLinearGradient(0,H*.3,0,H);
+    bg.addColorStop(0,'rgba(124,92,255,.35)'); bg.addColorStop(1,'rgba(79,209,255,.08)');
+    cx.fillStyle=bg; cx.fill();
+    cx.strokeStyle='rgba(79,209,255,.5)'; cx.stroke();
+    if(lubric>0){
+      for(let i=0;i<12;i++){
+        const ex=W*.5+Math.sin(frame*.05+i)*W*.25;
+        const ey=barrierY(ex)-drop*Math.exp(-Math.pow((ex-W*.5)/(W*.22),2))-8-Math.sin(frame*.08+i*2)*4;
+        cx.fillStyle=`rgba(79,209,255,${.3+lubric*.5})`;
+        cx.beginPath();cx.arc(ex,ey,3,0,7);cx.fill();
+      }
+    }
+    const nucY=H*.78;
+    let lx,rx;
+    if(phase===0){ lx=W*.08+prog*W*.32; rx=W*.92-prog*W*.32; }
+    else if(phase===1){ lx=W*.4-prog*W*.15; rx=W*.6+prog*W*.15; }
+    else if(phase===2){ lx=W*.4+prog*W*.08; rx=W*.6-prog*W*.08; }
+    else { lx=W*.48+prog*W*.04; rx=W*.52-prog*W*.04; }
+    function drawN(x,y,r,glow){
+      cx.fillStyle=glow; cx.beginPath();cx.arc(x,y,r+6,0,7);cx.fill();
+      cx.fillStyle='#fff'; cx.beginPath();cx.arc(x,y,r,0,7);cx.fill();
+      cx.fillStyle=DATA.colors.hot; cx.beginPath();cx.arc(x,y,r*.45,0,7);cx.fill();
+    }
+    if(phase<3){ drawN(lx,nucY,10,'rgba(79,209,255,.25)'); drawN(rx,nucY,10,'rgba(124,92,255,.25)'); }
+    else if(prog<.45){ drawN(lx,nucY,10*(1-prog*2),'rgba(255,107,61,.4)'); drawN(rx,nucY,10*(1-prog*2),'rgba(255,107,61,.4)'); }
+    else {
+      const flash=Math.min(1,(prog-.45)*4);
+      cx.fillStyle=`rgba(255,255,200,${flash*.7})`; cx.beginPath();cx.arc(W*.5,nucY,30*flash,0,7);cx.fill();
+      const sp=(prog-.5)*W*.5;
+      if(sp>0){
+        cx.font='bold 14px sans-serif'; cx.fillStyle=DATA.colors.acc;
+        cx.fillText('p',W*.5-sp,nucY-20-sp*.3); cx.fillStyle=DATA.colors.acc2;
+        cx.fillText('t',W*.5+sp,nucY-20-sp*.3);
+      }
+    }
+    cx.fillStyle='rgba(138,148,173,.8)'; cx.font='11px sans-serif';
+    cx.fillText(phase<2?'D + D':'D(d,p)T',W*.5-18,H-8);
+    requestAnimationFrame(drawScene);
+  }
+  initCanvas();
+  new IntersectionObserver(es=>{
+    es.forEach(e=>{ running=e.isIntersecting; if(running) requestAnimationFrame(drawScene); });
+  },{threshold:.25}).observe(cv);
+  addEventListener('resize',initCanvas);
+})();
+
+/* ---- metal chart (cinematic bars) ---- */
+(function(){
+  const cv=document.getElementById('metalChart');
+  const tip=document.getElementById('chartTip');
+  let cx,W,H,anim=[],grown=false,hover=-1,barTick=[];
+  const maxH=100;
+  function layout(){
+    ({cx,W,H}=setupCanvas(cv));
+    const pad={l:36,r:16,t:28,b:36}, bw=(W-pad.l-pad.r)/DATA.metals.length;
+    return DATA.metals.map((m,i)=>{
+      const x=pad.l+i*bw+bw*.15, w=bw*.7;
+      return {...m, x, w, target:m.h/maxH*(H-pad.t-pad.b), y0:H-pad.b};
+    });
+  }
+  let bars=[];
+  function drawChart(){
+    if(W<2||H<2) return;
+    cx.clearRect(0,0,W,H);
+    bars.forEach((b,i)=>{
+      const h=anim[i]||0;
+      const col=DATA.colors[b.kind]||DATA.colors.mut;
+      const gr=cx.createLinearGradient(b.x,b.y0-h,b.x,b.y0);
+      gr.addColorStop(0,col); gr.addColorStop(1,col+'33');
+      cx.fillStyle=gr;
+      const bh=Math.max(h,2);
+      cx.beginPath(); cx.roundRect(b.x,b.y0-bh,b.w,bh,6); cx.fill();
+      if(h>8){
+        cx.fillStyle='#e8ecf5'; cx.font='bold 11px sans-serif'; cx.textAlign='center';
+        cx.fillText(b.show,b.x+b.w/2,b.y0-bh-6);
+      }
+      cx.fillStyle='#8a94ad'; cx.font='11px sans-serif';
+      cx.fillText(b.sym,b.x+b.w/2,b.y0+16);
+      if(hover===i){
+        cx.strokeStyle=DATA.colors.acc; cx.lineWidth=2;
+        cx.strokeRect(b.x-2,b.y0-bh-2,b.w+4,bh+4);
+      }
+    });
+    cx.textAlign='left';
+  }
+  function tickBars(idx){
+    const b=bars[idx]; if(!b) return;
+    if(!barTick[idx]) barTick[idx]=0;
+    barTick[idx]++;
+    const t=Math.min(barTick[idx]/50,1);
+    const bounce=1+Math.sin(t*Math.PI)*.12*(1-t);
+    anim[idx]=b.target*t*bounce;
+    drawChart();
+    if(t<1) requestAnimationFrame(()=>tickBars(idx));
+    else anim[idx]=b.target, drawChart();
+  }
+  function growStagger(){
+    if(grown) return; grown=true; anim=bars.map(()=>0); barTick=[];
+    DATA.metals.forEach((_,i)=> setTimeout(()=>{ bars=layout(); tickBars(i); }, i*140));
+  }
+  cv.addEventListener('mousemove',e=>{
+    const r=cv.getBoundingClientRect(), mx=e.clientX-r.left;
+    hover=bars.findIndex(b=>mx>=b.x&&mx<=b.x+b.w);
+    if(hover>=0){
+      const b=DATA.metals[hover];
+      tip.style.display='block';
+      tip.querySelector('b').textContent=b.ue?`${b.ue} ± ${b.err} eV`:`~0 ± ${b.err} eV`;
+      tip.querySelector('small').textContent=`${b.sym} · σ = ±${b.err} eV`;
+      tip.style.left=(e.clientX-r.left+12)+'px';
+      tip.style.top=(e.clientY-r.top-40)+'px';
+    } else tip.style.display='none';
+    drawChart();
+  });
+  cv.addEventListener('mouseleave',()=>{hover=-1;tip.style.display='none';drawChart();});
+  cv.addEventListener('touchstart',e=>{
+    const t=e.touches[0], r=cv.getBoundingClientRect(), mx=t.clientX-r.left;
+    hover=bars.findIndex(b=>mx>=b.x&&mx<=b.x+b.w);
+    if(hover>=0){
+      const b=DATA.metals[hover];
+      tip.style.display='block';
+      tip.querySelector('b').textContent=b.ue?`${b.ue} ± ${b.err} eV`:`~0 ± ${b.err} eV`;
+      tip.querySelector('small').textContent=`${b.sym} · σ = ±${b.err} eV`;
+      tip.style.left=(mx+12)+'px'; tip.style.top=(t.clientY-r.top-40)+'px';
+    }
+    drawChart();
+  },{passive:true});
+  new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting) growStagger(); }); },{threshold:.3}).observe(cv);
+  addEventListener('resize',()=>{ bars=layout(); if(grown) anim=bars.map(b=>b.target); drawChart(); });
+  function initChart(){ bars=layout(); drawChart(); }
+  initChart();
+  window.addEventListener('load',initChart);
+})();
+
+/* ---- wave fields between sections ---- */
+(function(){
+  document.querySelectorAll('.wave-field').forEach((cv,i)=>{
+    let cx,W,H,off=Math.random()*100;
+    function init(){({cx,W,H}=setupCanvas(cv));}
+    function draw(){
+      cx.clearRect(0,0,W,H);
+      const t=Date.now()*.001+off;
+      for(let l=0;l<3;l++){
+        cx.beginPath(); cx.strokeStyle=`rgba(79,209,255,${.08+l*.04})`; cx.lineWidth=1;
+        for(let x=0;x<=W;x+=3){
+          const y=H*.5+Math.sin(x*.012+t*.6+l)*12+Math.sin(x*.025-t*.4+l*2)*6+l*4;
+          x?cx.lineTo(x,y):cx.moveTo(x,y);
+        }
+        cx.stroke();
+      }
+      requestAnimationFrame(draw);
+    }
+    init(); draw(); addEventListener('resize',init);
+  });
+})();
+
+/* ---- timeline energy fill (journey + roadmap) ---- */
+function wireTimeline(tlId, fillId, stepSel){
+  const tl=document.getElementById(tlId), fill=document.getElementById(fillId);
+  const steps=[...tl.querySelectorAll(stepSel)];
+  function update(){
+    const r=tl.getBoundingClientRect(), vh=innerHeight;
+    const p=Math.max(0,Math.min(1,(vh*.5-r.top)/(r.height*.85)));
+    let lit=Math.floor(p*steps.length);
+    if(p>.95) lit=steps.length-1;
+    steps.forEach((s,i)=> s.classList.toggle('lit', i<=lit));
+    if(steps.length>1){
+      const top=steps[0].offsetTop+6, bot=steps[lit]?.offsetTop+6||top;
+      fill.style.top=top+'px'; fill.style.height=Math.max(0,bot-top)+'px';
+    }
+  }
+  window.addEventListener('scroll',update,{passive:true});
+  update();
+}
+wireTimeline('journeyTl','journeyFill','.step[data-step]');
+wireTimeline('roadmapTl','roadmapFill','.step[data-rstep]');
+</script>
+</body>
+</html>
